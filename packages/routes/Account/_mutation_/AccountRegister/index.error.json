@@ -1,0 +1,24 @@
+{
+  "errors": {
+    "USER_ALREADY_EXISTS": {
+      "code": "USER_ALREADY_EXISTS",
+      "message": "User with this email already exists",
+      "status_code": 409
+    },
+    "INVALID_EMAIL": {
+      "code": "INVALID_EMAIL", 
+      "message": "Invalid email format",
+      "status_code": 400
+    },
+    "WEAK_PASSWORD": {
+      "code": "WEAK_PASSWORD",
+      "message": "Password must be at least 8 characters long",
+      "status_code": 400
+    },
+    "MISSING_REQUIRED_FIELDS": {
+      "code": "MISSING_REQUIRED_FIELDS",
+      "message": "Required fields are missing",
+      "status_code": 400
+    }
+  }
+}

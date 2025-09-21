@@ -1,0 +1,24 @@
+{
+  "errors": {
+    "INVALID_CREDENTIALS": {
+      "code": "INVALID_CREDENTIALS",
+      "message": "Invalid email or password",
+      "status_code": 401
+    },
+    "ACCOUNT_DISABLED": {
+      "code": "ACCOUNT_DISABLED",
+      "message": "Account is disabled",
+      "status_code": 403
+    },
+    "MISSING_EMAIL": {
+      "code": "MISSING_EMAIL",
+      "message": "Email is required",
+      "status_code": 400
+    },
+    "MISSING_PASSWORD": {
+      "code": "MISSING_PASSWORD",
+      "message": "Password is required",
+      "status_code": 400
+    }
+  }
+}
