@@ -17,16 +17,56 @@ app = FastAPI(title="E-commerce Monorepo API", version="1.0.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:8001",
+        "http://127.0.0.1:8001"
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+    allow_headers=["*"],
 )
 
-# Add OPTIONS handler for GraphQL endpoint before mounting the router
-@app.options("/")
+# Add comprehensive OPTIONS handlers for CORS preflight requests
+@app.options("/graphql")
 async def graphql_options():
-    return Response(status_code=200)
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
+            "Access-Control-Max-Age": "86400"
+        }
+    )
+
+@app.options("/")
+async def root_options():
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
+            "Access-Control-Max-Age": "86400"
+        }
+    )
+
+# Catch-all OPTIONS handler for any other preflight requests
+@app.options("/{full_path:path}")
+async def options_handler():
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
+            "Access-Control-Max-Age": "86400"
+        }
+    )
 
 # Mount GraphQL router with playground at /graphql
 graphql_app = GraphQLRouter(
@@ -36,7 +76,7 @@ graphql_app = GraphQLRouter(
 )
 
 # Mount GraphQL router at /graphql
-app.include_router(graphql_app, prefix="/graphql")
+app.include_router(graphql_app, prefix="/graphql", include_in_schema=True)
 
 # Redirect root to GraphQL Playground
 @app.get("/")

@@ -94,3 +94,13 @@ class Order(BaseModelWithID):
     status: OrderStatus = OrderStatus.PENDING
     delivery_address: Optional[Dict[str, Any]] = None
     special_instructions: Optional[str] = None
+
+class BlacklistedToken(BaseModelWithID):
+    token: str
+    user_id: str
+    blacklisted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime  # When the token would naturally expire
+
+class Wishlist(BaseModelWithID):
+    user_id: str
+    product_id: str

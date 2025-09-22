@@ -98,6 +98,25 @@ class UserUpdateInput:
     business_description: Optional[str] = None
 
 @strawberry.input
+class UserProfileUpdateInput:
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    business_name: Optional[str] = None
+    business_address: Optional[str] = None
+    business_description: Optional[str] = None
+    customer_category: Optional[CustomerCategory] = None
+    seller_type: Optional[SellerType] = None
+
+@strawberry.input
+class DeliveryAddressInput:
+    street: str
+    city: str
+    state: str
+    postal_code: str
+    country: str
+    is_default: Optional[bool] = False
+
+@strawberry.input
 class CategoryUpdateInput:
     name: Optional[str] = None
     description: Optional[str] = None
@@ -119,3 +138,7 @@ class ProductServiceUpdateInput:
 class OrderUpdateInput:
     status: Optional[OrderStatus] = None
     special_instructions: Optional[str] = None
+
+@strawberry.input
+class LogoutInput:
+    logout_all_devices: Optional[bool] = False
