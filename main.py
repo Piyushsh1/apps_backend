@@ -1,7 +1,7 @@
 from strawberry.fastapi import GraphQLRouter
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, RedirectResponse
+from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -14,60 +14,30 @@ load_dotenv(ROOT_DIR / '.env')
 # Create FastAPI app
 app = FastAPI(title="E-commerce Monorepo API", version="1.0.0")
 
-# Add CORS middleware
+"""
+Configure CORS
+- Use env var ALLOW_ORIGINS as a comma-separated list of allowed origins
+    e.g. ALLOW_ORIGINS=http://localhost:3000,https://app.example.com
+- Set to "*" to allow all origins (development only)
+"""
+origins_env = os.getenv("ALLOW_ORIGINS", "*")
+allow_origins = ["*"] if origins_env == "*" else [o.strip() for o in origins_env.split(",") if o.strip()]
+
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-      "*"
-    ],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
-    allow_headers=["*"],
+        CORSMiddleware,
+        allow_origins=allow_origins,
+        allow_credentials=False,  # JWT is sent via Authorization header; cookies not required
+        allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+        allow_headers=["*"]
 )
 
-# Add comprehensive OPTIONS handlers for CORS preflight requests
-@app.options("/graphql")
-async def graphql_options():
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
-            "Access-Control-Max-Age": "86400"
-        }
-    )
-
-@app.options("/")
-async def root_options():
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
-            "Access-Control-Max-Age": "86400"
-        }
-    )
-
-# Catch-all OPTIONS handler for any other preflight requests
-@app.options("/{full_path:path}")
-async def options_handler():
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, X-Requested-With",
-            "Access-Control-Max-Age": "86400"
-        }
-    )
+# Rely on CORSMiddleware for preflight; no manual OPTIONS handlers needed
 
 # Mount GraphQL router with playground at /graphql
 graphql_app = GraphQLRouter(
     schema,
     context_getter=db_context.get_context,
-    graphql_ide=True  # Enable GraphQL Playground
+    graphql_ide=True  
 )
 
 # Mount GraphQL router at /graphql
